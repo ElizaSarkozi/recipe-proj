@@ -27,3 +27,4 @@ dependencies:
       branch: master
       commands:
         - mvn -s .circleci.settings.xml -DskipTests deploy
+          ###just for changes
