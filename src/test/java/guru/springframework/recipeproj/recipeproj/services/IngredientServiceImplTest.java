@@ -9,7 +9,6 @@ import guru.springframework.recipeproj.recipeproj.domain.Recipe;
 import guru.springframework.recipeproj.recipeproj.repositories.RecipeRepository;
 import guru.springframework.recipeproj.recipeproj.repositories.UnitOfMeasureRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -80,32 +79,51 @@ public class IngredientServiceImplTest {
         verify(recipeRepository, times(1)).findById(anyLong());
     }
 
+//    @Test
+//    public void testSaveRecipeCommand() throws Exception {
+//        //given
+//        IngredientCommand command = new IngredientCommand();
+//        command.setId(3L);
+//        command.setRecipeId(2L);
+//
+//        Optional<Recipe> recipeOptional = Optional.of(new Recipe());
+//
+//        Recipe savedRecipe = new Recipe();
+//        savedRecipe.addIngredient(new Ingredient());
+//        savedRecipe.getIngredients().iterator().next().setId(3L);
+//
+//        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+//        when(recipeRepository.save(any())).thenReturn(savedRecipe);
+//
+//        //when
+//        System.err.println(ingredientService);
+//        IngredientCommand savedCommand = ingredientService.saveIngredientCommand(command);
+//
+//        //then
+//        assertEquals(Long.valueOf(3L), savedCommand.getId());
+//        verify(recipeRepository, times(1)).findById(anyLong());
+//        verify(recipeRepository, times(1)).save(any(Recipe.class));
+//
+//    }
+
     @Test
-    @Ignore
-    public void testSaveRecipeCommand() throws Exception {
+    public void testDeleteById() throws Exception {
         //given
-        IngredientCommand command = new IngredientCommand();
-        command.setId(3L);
-        command.setRecipeId(2L);
-
-        Optional<Recipe> recipeOptional = Optional.of(new Recipe());
-
-        Recipe savedRecipe = new Recipe();
-        savedRecipe.addIngredient(new Ingredient());
-        savedRecipe.getIngredients().iterator().next().setId(3L);
+        Recipe recipe = new Recipe();
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(3L);
+        recipe.addIngredient(ingredient);
+        ingredient.setRecipe(recipe);
+        Optional<Recipe> recipeOptional = Optional.of(recipe);
 
         when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
-        when(recipeRepository.save(any())).thenReturn(savedRecipe);
 
         //when
-        System.err.println(ingredientService);
-        IngredientCommand savedCommand = ingredientService.saveIngredientCommand(command);
+        ingredientService.deleteById(1L, 3L);
 
         //then
-        assertEquals(Long.valueOf(3L), savedCommand.getId());
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, times(1)).save(any(Recipe.class));
-
     }
 
 }
