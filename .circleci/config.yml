@@ -2,29 +2,40 @@
 version: 2.1
 
 # Use a package of configuration called an orb, see https://circleci.com/docs/2.0/orb-intro/
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.3.1
+jobs:
+  build:
+    docker:
+      -image: circleci/openjdk:8-jdk
 
-# Orchestrate or schedule a set of jobs, see https://circleci.com/docs/2.0/workflows/
-workflows:
-  # Name the workflow "Welcome"
-  Welcome:
-    # Run the welcome/run job in its own container
-    jobs:
-      - welcome/run
+    working_directory: ~/repo
 
-dependencies:
-  override:
-    - mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
+      environment:
+        # Customize the JVM maximum heap limit
+        MAVEN_OPTS: -Xmx3200m
 
-  test:
-    override:
-      - mvn -o surefire:test
+      steps:
+        - checkout
 
-  deployment:
-    main:
-      branch: master
-      commands:
-        - mvn -s .circleci.settings.xml -DskipTests deploy
-          ###just for changes
+        # Download and cache dependencies
+        - restore_cache:
+            keys:
+              - v1-dependencies-{{ checksum "pom.xml" }}
+              # fallback to using the latest cache if no exact match is found
+              - v1-dependencies-
+
+        - run: mvn dependency:go-offline
+
+        - save_cache:
+            paths:
+              - ~/.m2
+            key: v1-dependencies-{{ checksum "pom.xml" }}
+
+        # run tests! and gen code coverage
+        - run: mvn integration-test cobertura:cobertura
+
+        - store_test_results:
+            path: target/surefire-reports
+
+        - run:
+            name: Send to CodeCov
+            command: bash <(curl -s https://codecov.io/bash)
